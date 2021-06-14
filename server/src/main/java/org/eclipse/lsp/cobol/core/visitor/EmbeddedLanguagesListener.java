@@ -20,9 +20,7 @@ import lombok.Getter;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.core.CobolParserBaseListener;
-import org.eclipse.lsp.cobol.core.Db2SqlLexer;
-import org.eclipse.lsp.cobol.core.Db2SqlParser;
+import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.model.EmbeddedCode;
 
 import java.util.HashMap;
@@ -65,6 +63,21 @@ public class EmbeddedLanguagesListener extends CobolParserBaseListener {
     parseSql(ctx.execSqlStatement(), Db2SqlParser::dataDivisionRules);
   }
 
+  @Override
+  public void exitExecCicsStatement(ExecCicsStatementContext ctx) {
+    parseCics(ctx.cicsRules());
+  }
+
+  private void parseCics(CicsRulesContext context) {
+    CICSLexer lexer = new CICSLexer(CharStreams.fromString(VisitorHelper.getIntervalText(context)));
+    lexer.removeErrorListeners();
+
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    embeddedCodeParts.put(
+        context.getStart(),
+        new EmbeddedCode(new CICSParser(tokens).allCicsRules(), tokens, calculateShift(context)));
+  }
+
   private void parseSql(
       ExecSqlStatementContext context, Function<Db2SqlParser, ParserRuleContext> grammarStartRule) {
 
@@ -93,7 +106,7 @@ public class EmbeddedLanguagesListener extends CobolParserBaseListener {
     return parser;
   }
 
-  private int calculateShift(SqlCodeContext ctx) {
+  private int calculateShift(ParserRuleContext ctx) {
     Interval interval = ctx.getSourceInterval();
     return interval.b - interval.a;
   }

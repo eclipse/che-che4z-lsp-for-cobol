@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
+import org.eclipse.lsp.cobol.core.visitor.CICSVisitor;
 import org.eclipse.lsp.cobol.core.visitor.Db2SqlVisitor;
 
 import java.util.List;
@@ -61,6 +62,9 @@ public class EmbeddedCodeNode extends Node {
       case SQL:
         visitor = new Db2SqlVisitor(mapping, constants);
         break;
+      case CICS:
+        visitor = new CICSVisitor(mapping, constants);
+        break;
       default:
         throw new UnsupportedOperationException("Cannot recognize language type");
     }
@@ -70,6 +74,7 @@ public class EmbeddedCodeNode extends Node {
 
   /** This enum holds all the supported embedded languages that require a separate parsing */
   public enum Language {
-    SQL
+    SQL,
+    CICS
   }
 }

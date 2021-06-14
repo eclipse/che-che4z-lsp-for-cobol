@@ -9,8 +9,6 @@
 parser grammar CobolParser;
 options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 
-import CICSParser;
-
 startRule : compilationUnit EOF;
 
 compilationUnit
@@ -1549,7 +1547,11 @@ evaluateValue
 
 // exec cics statement
 execCicsStatement
-   : EXEC CICS allCicsRules END_EXEC DOT_FS?
+   : EXEC CICS cicsRules END_EXEC DOT_FS?
+   ;
+
+cicsRules
+   : ~END_EXEC*?
    ;
 
 // exec sql statement for specific divisions or sections of COBOL program
@@ -3061,7 +3063,361 @@ idms_table_name
     : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "table name", 8);}
     ;
 
-idms_quoted_number
-    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
-    ;
+// identifier ----------------------------------
 
+generalIdentifier
+   : qualifiedDataName | tableCall | functionCall | specialRegister
+   ;
+
+tableCall
+   : dataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   ;
+
+functionCall
+   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
+   ;
+
+referenceModifier
+   : LPARENCHAR characterPosition COLONCHAR length? RPARENCHAR
+   ;
+
+characterPosition
+   : arithmeticExpression
+   ;
+
+length
+   : arithmeticExpression
+   ;
+
+subscript
+   : ALL | integerLiteral | arithmeticExpression
+   ;
+
+argument
+   : literal | generalIdentifier | arithmeticExpression
+   ;
+
+// qualified data name ----------------------------------
+
+qualifiedDataName
+   : qualifiedDataNameFormat1 | qualifiedDataNameFormat2 | qualifiedDataNameFormat4
+   ;
+
+qualifiedDataNameFormat1
+   : dataName qualifiedInData*
+   ;
+
+qualifiedDataNameFormat2
+   : paragraphName inSection
+   ;
+
+qualifiedDataNameFormat4
+   : LINAGE_COUNTER inFile
+   ;
+
+qualifiedInData
+   : inData | inTable
+   ;
+
+specialRegister
+   : ADDRESS OF generalIdentifier
+   | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
+   | LENGTH OF? generalIdentifier | LINAGE_COUNTER | LINE_COUNTER
+   | PAGE_COUNTER
+   | RETURN_CODE
+   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN
+   | TALLY | TIME
+   | WHEN_COMPILED
+   ;
+
+// in ----------------------------------
+
+inData
+   : (IN | OF) dataName
+   ;
+
+inFile
+   : (IN | OF) fileName
+   ;
+
+inSection
+   : (IN | OF) sectionName
+   ;
+
+inTable
+   : (IN | OF) tableCall
+   ;
+
+// names ----------------------------------
+
+alphabetName
+   : cobolWord
+   ;
+
+assignmentName
+   : systemName
+   ;
+
+cdName
+   : cobolWord
+   ;
+
+className
+   : cobolWord
+   ;
+
+computerName
+   : systemName
+   ;
+
+conditionName
+   : cobolWord
+   ;
+
+dataName
+   : cobolWord
+   ;
+
+environmentName
+   : systemName
+   ;
+
+fileName
+   : cobolWord
+   ;
+
+functionName
+   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cobolWord
+   ;
+
+indexName
+   : cobolWord
+   ;
+
+libraryName
+   : cobolWord
+   ;
+
+mnemonicName
+   : cobolWord
+   ;
+
+paragraphName
+   : cobolWord | integerLiteral
+   ;
+
+paragraphNameUsage
+   : cobolWord | integerLiteral
+   ;
+
+procedureName
+   : paragraphNameUsage inSection?
+   ;
+
+programName
+   : NONNUMERICLITERAL | cobolWord// | cics_cobol_intersected_words
+   ;
+
+recordName
+   : qualifiedDataName
+   ;
+
+reportName
+   : qualifiedDataName
+   ;
+
+sectionName
+   : cobolWord | integerLiteral
+   ;
+
+systemName
+   : cobolWord
+   ;
+
+symbolicCharacter
+   : cobolWord
+   ;
+
+figurativeConstant
+   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
+   ;
+
+booleanLiteral
+   : TRUE | FALSE
+   ;
+
+numericLiteral
+   : NUMERICLITERAL | ZERO | integerLiteral
+   ;
+
+integerLiteral
+   : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
+   ;
+
+literal
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString
+   ;
+
+charString
+   : FINALCHARSTRING
+   ;
+
+// arithmetic expression ----------------------------------
+
+arithmeticExpression
+   : multDivs plusMinus*
+   ;
+
+plusMinus
+   : (PLUSCHAR | MINUSCHAR) multDivs
+   ;
+
+multDivs
+   : powers multDiv*
+   ;
+
+multDiv
+   : (ASTERISKCHAR | SLASHCHAR) powers
+   ;
+
+powers
+   : (PLUSCHAR | MINUSCHAR)? basis power*
+   ;
+
+power
+   : DOUBLEASTERISKCHAR basis
+   ;
+
+basis
+   : LPARENCHAR arithmeticExpression RPARENCHAR | literal | generalIdentifier
+   ;
+//
+//cics_cobol_intersected_words
+//    : ABORT | ADD | ADDRESS | AFTER | ALTER | AND | AS | ASSIGN | AT | BINARY | CANCEL | CHANNEL | CLASS | CLOSE
+//    | CONTROL | COPY | DATA | DATE | DELETE | DELIMITER | DETAIL | END | ENTER | ENTRY | EQUAL | ERASE | ERROR | EVENT
+//    | EXCEPTION | EXTERNAL | FILE | FOR | FROM | INPUT | INTO | INVOKE | LABEL | LAST | LENGTH | LINE | LIST | MESSAGE
+//    | MMDDYYYY | MODE | MOVE | NEXT | ON | OPEN | OR | ORGANIZATION | OUTPUT | PAGE | PARSE | PASSWORD | PF | PROCESS
+//    | PROGRAM | PURGE | QUEUE | READ | RECEIVE | RECORD | RELEASE | REMOVE | REPLACE | RESET | RETURN | REWIND | REWRITE
+//    | RUN | SECURITY | SEND | SERVICE | SET | SHARED | START | STATUS | SYMBOL | TASK | TERMINAL | TEST | TEXT | TIME
+//    | TIMER | TITLE | TO | TYPE | UNTIL | USING | VALUE | WAIT | WRITE | YEAR | YYYYDDD | YYYYMMDD
+//    ;
+
+cobolCompilerDirectivesKeywords
+   : ADATA | ADV | ANSI | APOST | AR | ARITH | AWO | ALIAS | ANY | AUTO
+   | BIN | BLOCK0 | BUF | BUFSIZE
+   | C_CHAR | CBLCARD | CO | COBOL2 | COBOL3 | CODEPAGE | COMPAT | COMPILE | CP | CPP | CPSM | CICS | CS | CURR | CURRENCY
+   | D_CHAR | DATEPROC | DBCS | DD | DEBUG | DECK | DIAGTRUNC | DLL | DP | DTR | DU | DUMP | DYNAM | DYN
+   | E_CHAR | EDF | EJPD | EN | ENGLISH | EPILOG | EXTEND | EXIT | EXP | EXPORTALL
+   | F_CHAR | FASTSRT | FEPI | FLAG | FLAGSTD | FSRT | FULL
+   | G_CHAR | GDS | GRAPHIC
+   | H_CHAR | HOOK
+   | I_CHAR | INTDATE
+   | JA | JP
+   | K_CHAR | KA
+   | LANG | LANGUAGE | LC | LEASM | LILIAN | LIN | LINECOUNT | LIST | LM | LONGMIXED | LONGUPPER | LU
+   | M_CHAR | MAP | MARGINS | MAX | MDECK | MD | MIG | MIXED
+   | N_CHAR | NAME | NAT | NATLANG | NN | NS | NSEQ | NSYMBOL
+   | NOALIAS | NOADATA | NOADV | NOAWO
+   | NOBLOCK0
+   | NOC | NOCOMPILE | NOCBLCARD | NOCICS | NOCMPR2 | NOCPSM | NOCURRENCY | NOCURR
+   | NODATEPROC | NODP | NODBCS | NODEBUG | NODECK | NOD | NODLL | NODE| NODUMP | NODU | NODIAGTRUNC | NODTR | NODYNAM | NODYN
+   | NOEDF | NOEPILOG | NOEXIT | NOEXPORTALL | NOEXP | NOEJPD
+   | NOFLAG | NOFASTSRT | NOFSRT | NOFEPI | NOF | NOFLAGMIG | NOFLAGSTD
+   | NOGRAPHIC
+   | NOHOOK
+   | NOLENGTH | NOLIB | NOLINKAGE | NOLIST
+   | NOMAP | NOMDECK | NOMD | NONUMBER | NONUM
+   | NONAME
+   | NOOBJECT | NOOBJ | NOOFFSET | NOOFF | NOOPSEQUENCE | NOOPTIMIZE | NOOPT | NOOPTIONS | NOP
+   | NOPROLOG | NOPFD
+   | NORENT
+   | NOSEQUENCE | NOSEQ | NOSOURCE | NOS | NOSPIE | NOSQL | NOSQLCCSID | NOSQLC | NOSSRANGE | NOSSR | NOSTDTRUNC
+   | NOTRIG | NOTERMINAL | NOTERM | NOTEST | NOTHREAD
+   | NOVBREF
+   | NOWORD | NOWD
+   | NOXREF | NOX
+   | NOZWB
+   | NUMBER | NUM | NUMPROC
+   | OBJECT | OBJ | OFFSET | OFF | OPMARGINS | OPSEQUENCE | OPTIMIZE | OPT | OPTFILE | OPTIONS | OP | OUTDD | OUT
+   | PFD | PGMNAME | PGMN | PROLOG
+   | RENT | RES | RMODE
+   | S_CHAR | SS | SP | SZ | STD | SSR | SEQ | SEP
+   | SOURCE | SPIE | SQLCCSID | SQLC | SSRANGE | SYSEIB | SEQUENCE| SIZE | SEPARATE | SHORT
+   | Q_CHAR | QUOTE
+   | TRIG | TERMINAL | TERM | TEST | THREAD | TRUNC
+   | U_CHAR | UE | UPPER
+   | VBREF
+   | W_CHAR | WORD | WD
+   | X_CHAR | XMLPARSE | XMLSS | XP | XREF
+   | YEARWINDOW | YW
+   | ZWB
+   ;
+
+
+cobolWord
+   : IDENTIFIER | idms_only_words | cobolCompilerDirectivesKeywords
+//   | ABEND | ABORT | ALARM | ALL | ALWAYS | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTACH
+//   | BINARY | BIND | BIT | BLOB | BOUNDS
+//   | CANCEL | CAPABLE | CCSVERSION | CHANGE | CHANGED | CHANNEL | CHECK | CLASS | CLOB | CLOSE_DISPOSITION
+//   | COBOL | CODE | COMMIT | COMMITMENT | CONNECT | CONVENTION | COUNT | CRUNCH | CURRENT | CURSOR
+//   | DATA | DBCLOB
+//   | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DIFFERENT
+//   | DISCONNECT | DISK | DOUBLE | DUMP
+//   | EBCDIC | ENTER | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXIT | EXTENDED
+//   | FINISH | FIRST | FREE | FUNCTION_POINTER | GET | HEADER | HOLD
+//   | ID | IGNORED | IMPLICIT | INTEGER | INTERVAL | INVOKED | IN | INTO | IO
+//   | KEEP | KEPT | KEYBOARD
+//   | LANGUAGE | LAST | LIBRARY | LINK | LIST | LOCAL | LONG
+//   | LONG_DATE | LONG_TIME | LOWER | LR | LTERM | LOCATION
+//   | MAP | MAX | MESSAGE | MMDDYYYY
+//   | NAME | NAMED | NATIONAL | NATIONAL_EDITED | NATIVE | NETWORK | NEXT
+//   | NODUMP | NOWAIT | NOWRITE | NUMERIC_DATE
+//   | NUMERIC_TIME
+//   | OBJECT | ODT | OF | OFF | ONLY | ORDERLY | OWN | POINTER_32
+//   | PASSWORD | PORT | POSITION | POST | PRINTER | PRIOR | PRIORITY | PROCEDURE | PROCESS | PROGRAM | PTERM
+//   | READ | READER | REAL | RECEIVED | RECURSIVE | REF | REMOTE | REMOVE | REPLY | REPORT | ROLLBACK
+//   | SAVE | SCHEMA | SCRATCH | SCREENSIZE | SESSION | SHARED | SHORT_DATE | SNAP | SQL | START | STATISTICS
+//   | STATS | STORAGE | SYMBOL | SYSVERSION | SYSTEM
+//   | TASK | TERMINAL | TEXT | THEN | THREAD | THREAD_LOCAL | TIMEOUT | TIMER
+//   | TODAYS_DATE | TODAYS_NAME | TRANSFER
+//   | TRANSACTION | TRUNCATED | TYPEDEF
+//   | UPDATE | USER | UTF_8
+//   | VERSION | VIRTUAL
+//   | WAIT | XCTL
+//   | YEAR | YYYYMMDD | YYYYDDD
+   ;
+
+idms_only_words
+    : ATTRIBUTE | AUTODISPLAY
+    | BACKPAGE | BACKSCAN | BLINK
+    | BLUE | BRIGHT | BROWSE | BUT
+    | CALC | CONTENTS | COPIES | CORRECT
+    | DARK | DATASTREAM
+    | DBNAME | DBNODE | DB_KEY
+    | DC | DEQUEUE | DEST | DETECT | DFLD
+    | DICTNAME | DICTNODE | DIFFERENT | DUPLICATE
+    | EAU | ECHO | EDIT | EIGHTYCR | ENDPAGE | ENDRPT
+    | ENQUEUE | EXITS | EXTRANEOUS
+    | FIELDS | FIND | FORTYCR
+    | GREEN
+    | IDENTICAL | IDMS | INTERNAL
+    | JOURNAL
+    | LOADLIB | LOG | LONGTERM
+    | MAPS | MDT | MEMBERS
+    | MODIFIED | MODIFY
+    | NEWPAGE | NOALARM | NOAUTODISPLAY
+    | NOBACKPAGE | NOBACKSCAN | NOBLINK | NOCOLOR | NODEADLOCK
+    | NODENAME | NOIO | NOKBD | NOLOCK | NOMDT
+    | NOPRT | NORETURN | NORMAL
+    | NORMAL_VIDEO | NOSPAN | NOTIFICATION | NOTIFY | NOUNDERSCORE
+    | OBTAIN | OUTIN | OWNER
+    | PAGE_INFO | PARMS | PERMANENT | PINK | PROTECTED
+    | READY | RED | REDISPATCH | RESETKBD | RESETMDT | RETENTION | RETRIEVAL
+    | RETURNKEY | REVERSE_VIDEO | RUN_UNIT
+    | SCREEN | SELECTIVE | SHORT | SIXTYFOURCR | SPAN
+    | STARTPAGE | STARTPRT | STGID | STORE
+    | TURQUOISE
+    | UNDERSCORE | UNFORMATTED | UNPROTECTED
+    | UPGRADE | USAGE_MODE
+    | WCC | WHITE | WITHIN | YELLOW
+    ;

@@ -356,7 +356,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    return visitChildren(ctx);
+    EmbeddedCode code = embeddedCodeParts.get(ctx.cicsRules().getStart());
+    // apply area B check for tokens provided by a specific lexer
+    areaBWarning(code.getTokens());
+    return getLocality(ctx.getStart())
+        .<List<Node>>map(
+            it ->
+                ImmutableList.of(
+                    new EmbeddedCodeNode(
+                        it, code.getTokenStream(), code.getTree(), EmbeddedCodeNode.Language.CICS)))
+        .orElse(ImmutableList.of());
   }
 
   @Override
