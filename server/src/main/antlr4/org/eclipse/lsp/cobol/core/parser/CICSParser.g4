@@ -1097,7 +1097,7 @@ qualifiedDataName
    ;
 
 qualifiedDataNameFormat1
-   : dataName qualifiedInData*
+   : dataName (inData | inTable)*
    ;
 
 qualifiedDataNameFormat2
@@ -1106,10 +1106,6 @@ qualifiedDataNameFormat2
 
 qualifiedDataNameFormat4
    : LINAGE_COUNTER inFile
-   ;
-
-qualifiedInData
-   : inData | inTable
    ;
 
 specialRegister
@@ -1165,10 +1161,6 @@ className
 
 computerName
    : systemName
-   ;
-
-conditionName
-   : cobolWord
    ;
 
 dataName

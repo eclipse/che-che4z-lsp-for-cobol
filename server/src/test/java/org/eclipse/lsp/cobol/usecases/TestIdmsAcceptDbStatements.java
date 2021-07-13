@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -41,13 +41,18 @@ class TestIdmsAcceptDbStatements {
           + "       01 {$*DC1} PIC X(8).\n"
           + "       01 {$*EMP-LOC} PIC S9(8) COMP SYNC.\n"
           + "       01 {$*DB-KEY1} PIC S9(8) COMP SYNC.\n"
+          + "       01 {$*employee} PIC S9(8) COMP SYNC.\n"
+          + "       01 {$*DEPT-EMPL} PIC S9(8) COMP SYNC.\n"
+          + "       01 {$*EMP_AREA} PIC S9(8) COMP SYNC.\n"
+          + "       01 {$*ABC-PROC} PIC S9(8) COMP SYNC.\n"
           + "       PROCEDURE DIVISION.\n";
 
-  private static final String TST1 = DEFS + "           ACCEPT {$DB1} FOR EMPLOYEE.\n";
+  private static final String TST1 = DEFS + "           ACCEPT {$DB1} FOR {$EMPLOYEE}.\n";
 
-  private static final String TST2 = DEFS + "           ACCEPT {$DB1} FROM ABC-PROC PROCEDURE.\n";
+  private static final String TST2 =
+      DEFS + "           ACCEPT {$DB1} FROM {$abc-proc} PROCEDURE.\n";
 
-  private static final String TST3 = DEFS + "           ACCEPT {$EMP-LOC} FROM EMPLOYEE BIND.\n";
+  private static final String TST3 = DEFS + "           ACCEPT {$EMP-LOC} FROM {$EMPLOYEE} BIND.\n";
 
   private static final String TST4 = DEFS + "           ACCEPT {$DC1} FROM IDMS-STATISTICS.\n";
 
@@ -55,29 +60,29 @@ class TestIdmsAcceptDbStatements {
       DEFS + "           ACCEPT {$DC1} FROM IDMS-STATISTICS EXTENDED {$DB1}.\n";
 
   private static final String TST6 =
-      DEFS + "           ACCEPT {$DB-KEY1} FROM DEPT-EMPL CURRENCY.\n";
+      DEFS + "           ACCEPT {$DB-KEY1} FROM {$DEPT-EMPL} CURRENCY.\n";
 
   private static final String TST7 = DEFS + "           ACCEPT {$DB-KEY1} FROM CURRENCY.\n";
 
   private static final String TST8 =
-      DEFS + "           ACCEPT {$DB-KEY1} FROM DEPT-EMPL OWNER CURRENCY.\n";
+      DEFS + "           ACCEPT {$DB-KEY1} FROM {$DEPT-EMPL} OWNER CURRENCY.\n";
 
   private static final String TST9 =
-      DEFS + "           ACCEPT {$DB-KEY1} FROM EMP_AREA NEXT CURRENCY PAGE-INFO {$DB1}. \n";
+      DEFS + "           ACCEPT {$DB-KEY1} FROM {$EMP_AREA} NEXT CURRENCY PAGE-INFO {$DB1}. \n";
 
   private static final String TST10 =
       DEFS
-          + "           ACCEPT {$DB1} FOR EMPLOYEE \n"
+          + "           ACCEPT {$DB1} FOR {$EMPLOYEE} \n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
 
   private static final String TST20 =
       DEFS
-          + "           ACCEPT {$DB1} FROM ABC-PROC PROCEDURE\n"
+          + "           ACCEPT {$DB1} FROM {$ABC-PROC} PROCEDURE\n"
           + "           ON {$ANY-ERROR-STATUS} DISPLAY 'PROC NOT FOUND'.\n";
 
   private static final String TST30 =
       DEFS
-          + "           ACCEPT {$EMP-LOC} FROM EMPLOYEE BIND\n"
+          + "           ACCEPT {$EMP-LOC} FROM {$EMPLOYEE} BIND\n"
           + "           ON {$ANY-STATUS} DISPLAY 'ACCEPT ADDRESS '.\n";
 
   private static final String TST40 =
@@ -92,7 +97,7 @@ class TestIdmsAcceptDbStatements {
 
   private static final String TST60 =
       DEFS
-          + "           ACCEPT {$DB-KEY1} FROM DEPT-EMPL CURRENCY\n"
+          + "           ACCEPT {$DB-KEY1} FROM {$DEPT-EMPL} CURRENCY\n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
 
   private static final String TST70 =
@@ -101,11 +106,11 @@ class TestIdmsAcceptDbStatements {
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
   private static final String TST80 =
       DEFS
-          + "           ACCEPT {$DB-KEY1} FROM DEPT-EMPL OWNER CURRENCY\n"
+          + "           ACCEPT {$DB-KEY1} FROM {$DEPT-EMPL} OWNER CURRENCY\n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
   private static final String TST90 =
       DEFS
-          + "           ACCEPT {$DB-KEY1} FROM EMP_AREA NEXT CURRENCY PAGE-INFO {$DB1} \n"
+          + "           ACCEPT {$DB-KEY1} FROM {$EMP_AREA} NEXT CURRENCY PAGE-INFO {$DB1} \n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
 
   private static Stream<String> textsToTest() {

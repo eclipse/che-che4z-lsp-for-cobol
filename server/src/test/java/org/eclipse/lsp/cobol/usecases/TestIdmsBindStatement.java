@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,6 +33,9 @@ class TestIdmsBindStatement {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*DB1} PIC X(8).\n"
           + "       01 {$*DC1} PIC X(8).\n"
+          + "       01 {$*EMPINFO} PIC X(8).\n"
+          + "       01 {$*EMPLOYEE} PIC X(8).\n"
+          + "       01 {$*ABCPROC} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String BIND1 =
@@ -45,23 +48,24 @@ class TestIdmsBindStatement {
 
   private static final String BIND4 = DEFS + "           BIND RUN-UNIT DICTNAME {$DC1}.\n";
 
-  private static final String BIND5 = DEFS + "           BIND MAP EMPINFO.\n";
+  private static final String BIND5 = DEFS + "           BIND MAP {$EMPINFO}.\n";
 
-  private static final String BIND6 = DEFS + "           BIND MAP EMPINFO RECORD EMPLOYEE.\n";
+  private static final String BIND6 = DEFS + "           BIND MAP {$EMPINFO} RECORD {$EMPLOYEE}.\n";
 
   private static final String BIND7 =
-      DEFS + "           BIND MAP EMPINFO RECORD EMPLOYEE TO NULL.\n";
+      DEFS + "           BIND MAP {$EMPINFO} RECORD {$EMPLOYEE} TO NULL.\n";
 
   private static final String BIND8 =
-      DEFS + "           BIND MAP EMPINFO RECORD EMPLOYEE TO {$DB1}.\n";
+      DEFS + "           BIND MAP {$EMPINFO} RECORD {$EMPLOYEE} TO {$DB1}.\n";
 
-  private static final String BIND9 = DEFS + "           BIND PROCEDURE FOR ABCPROC TO {$DB1}.\n";
+  private static final String BIND9 =
+      DEFS + "           BIND PROCEDURE FOR {$ABCPROC} TO {$DB1}.\n";
 
-  private static final String BIND10 = DEFS + "          BIND EMPLOYEE\n";
+  private static final String BIND10 = DEFS + "          BIND {$EMPLOYEE}\n";
 
-  private static final String BIND11 = DEFS + "          BIND EMPLOYEE TO {$DB1}.\n";
+  private static final String BIND11 = DEFS + "          BIND {$EMPLOYEE} TO {$DB1}.\n";
 
-  private static final String BIND12 = DEFS + "          BIND {$DB1} WITH EMPLOYEE\n";
+  private static final String BIND12 = DEFS + "          BIND {$DB1} WITH {$EMPLOYEE}\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

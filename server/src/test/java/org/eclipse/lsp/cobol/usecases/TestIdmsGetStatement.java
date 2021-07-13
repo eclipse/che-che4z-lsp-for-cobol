@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,13 +38,17 @@ class TestIdmsGetStatement {
           + "        01 {$*WK_ID} PIC S9(8) COMP.\n"
           + "        01 {$*WK_TIME} PIC S9(11) COMP-3.\n"
           + "        01 {$*WK_DATE} PIC S9(7).\n"
+          + "        01 {$*EMPLOYEE} PIC S9(7).\n"
+          + "        01 {$*EMP-AREA} PIC S9(7).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String GET1 =
-      DEFS + "           FIND FIRST EMPLOYEE WITHIN EMP-AREA.\n" + "           GET EMPLOYEE.\n";
+      DEFS
+          + "           FIND FIRST {$EMPLOYEE} WITHIN {$EMP-AREA}.\n"
+          + "           GET {$EMPLOYEE}.\n";
 
   private static final String GET2 =
-      DEFS + "           FIND FIRST EMPLOYEE WITHIN EMP-AREA\n" + "           GET\n";
+      DEFS + "           FIND FIRST {$EMPLOYEE} WITHIN {$EMP-AREA}\n" + "           GET\n";
 
   private static final String GET_QUEUE =
       DEFS + "           GET QUEUE INTO {$WK_AREA1}\n" + "           TO {$WK_AREA2}.\n";

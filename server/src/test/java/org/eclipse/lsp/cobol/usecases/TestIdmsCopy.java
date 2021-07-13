@@ -28,7 +28,9 @@ class TestIdmsCopy {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \n"
           + "        PROGRAM-ID. test1.\n"
-          + "        DATA DIVISION.\n";
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*EMPLOYEE} PIC X(10).\n";
 
   private static final String COPY_IDMS_FILE =
       "        FILE SECTION.\n" + "            COPY IDMS FILE {~FL002} VERSION 1.\n";
@@ -89,7 +91,8 @@ class TestIdmsCopy {
 
   private static final String CB_NAME4 = "SUBSCHEMA-BINDS";
   private static final String CB_NAME4A = "ABCD";
-  private static final String CB4 = "           BIND RUN-UNIT.\n" + "            BIND EMPLOYEE.\n";
+  private static final String CB4 =
+      "           BIND RUN-UNIT.\n" + "            BIND {$EMPLOYEE}.\n";
 
   private static final String CB_NAME5 = "FL002";
   private static final String CB5 = "       FD EMP-FILE.\n" + "       RECORD CONTAINS 80.\n";

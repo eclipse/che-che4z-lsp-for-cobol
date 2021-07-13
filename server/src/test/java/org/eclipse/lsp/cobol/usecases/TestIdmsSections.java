@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -47,13 +47,17 @@ class TestIdmsSections {
 
   private static final String IDMSMS_WITH_ALL_CLAUSES =
       "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        77 {$*MAP1} PIC X(10).\n"
+          + "        77 {$*MAP2} PIC X(10).\n"
+          + "        77 {$*MAP3} PIC X(10).\n"
           + "        SCHEMA SECTION.\n"
           + "            DB EMPSS012 WITHIN EMPSCHM.\n"
           + "        MAP SECTION.\n"
           + "        MAX FIELD LIST IS 12 \n"
-          + "        MAP MAP1 TYPE IS EXTENDED PAGING.\n"
-          + "        MAP MAP2\n"
-          + "        MAP MAP3 TYPE STANDARD.\n";
+          + "        MAP {$MAP1} TYPE IS EXTENDED PAGING.\n"
+          + "        MAP {$MAP2}\n"
+          + "        MAP {$MAP3} TYPE STANDARD.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

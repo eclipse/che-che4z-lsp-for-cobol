@@ -27,7 +27,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode.Type;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 
 import java.util.*;
@@ -264,9 +263,7 @@ public class VariableDefinitionUtil {
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
             new IndexItemNode(
-                nameAndLocality.getLocality(),
-                nameAndLocality.getName(),
-                variable.isGlobal()));
+                nameAndLocality.getLocality(), nameAndLocality.getName(), variable.isGlobal()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -314,9 +311,7 @@ public class VariableDefinitionUtil {
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
             new IndexItemNode(
-                nameAndLocality.getLocality(),
-                nameAndLocality.getName(),
-                variable.isGlobal()));
+                nameAndLocality.getLocality(), nameAndLocality.getName(), variable.isGlobal()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -429,7 +424,8 @@ public class VariableDefinitionUtil {
     String renamesName = renames.getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
     if (renamesIndex != -1)
-      variable.addChild(new VariableUsageNode(renamesName, renames.getLocality(), Type.GENERAL));
+      variable.addChild(
+          new VariableUsageNode(renamesName, renames.getLocality(), ImmutableList.of()));
     else
       errors =
           ImmutableList.of(
@@ -456,8 +452,8 @@ public class VariableDefinitionUtil {
         new VariableUsageNode(
             redefinesName,
             redefinesLocality,
-            Type.GENERAL,
-            collectVariableParentNames(definitionNode.getParent())));
+            collectVariableParentNames(definitionNode.getParent()),
+            VariableUsageNode.ReferenceType.CONTEXT));
     VariableWithLevelNode variableForRedefine =
         getPrecedingVariableForRedefine(definitionNode, redefinesName);
     if (variableForRedefine == null || !variableForRedefine.getName().equals(redefinesName)) {
@@ -489,13 +485,17 @@ public class VariableDefinitionUtil {
     return new ResultWithErrors<>(variableNode, errors);
   }
 
-  private List<String> collectVariableParentNames(Node parent) {
-    List<String> parents = new ArrayList<>();
+  private List<VariableNameAndLocality> collectVariableParentNames(Node parent) {
+    List<VariableNameAndLocality> parents = new ArrayList<>();
     while (parent != null && parent.getNodeType() == NodeType.VARIABLE) {
-      parents.add(((VariableNode) parent).getName());
+      parents.add(convertVariableNode((VariableNode) parent));
       parent = parent.getParent();
     }
     return parents;
+  }
+
+  private VariableNameAndLocality convertVariableNode(VariableNode node) {
+    return new VariableNameAndLocality(node.getName(), node.getLocality());
   }
 
   private VariableWithLevelNode getPrecedingVariableForRedefine(

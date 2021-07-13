@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -40,41 +40,44 @@ class TestIdmsMapInStatement {
           + "       01 {$*PAG-NUM} PIC S9(8).\n"
           + "       01 {$*DETKEY} PIC S9(8) COMP.\n"
           + "       01 {$*MFLD-LEN} PIC S9(4).\n"
+          + "       01 {$*EMPMAP} PIC S9(4).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String TST1 =
-      DEFS + "                MAP IN USING EMPMAP INPUT DATA IS YES.\n";
+      DEFS + "                MAP IN USING {$EMPMAP} INPUT DATA IS YES.\n";
 
-  private static final String TST2 = DEFS + "           MAP IN USING EMPMAP IO HEADER MODIFIED.\n";
+  private static final String TST2 =
+      DEFS + "           MAP IN USING {$EMPMAP} IO HEADER MODIFIED.\n";
 
   private static final String TST3 =
-      DEFS + "           MAP IN USING EMPMAP NOIO DATASTREAM FROM {$MFLD} LENGTH {$MFLD-LEN}.\n";
+      DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} LENGTH {$MFLD-LEN}.\n";
 
   private static final String TST4 =
-      DEFS + "           MAP IN USING EMPMAP NOIO DATASTREAM FROM {$MFLD} LENGTH 20.\n";
+      DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} LENGTH 20.\n";
 
   private static final String TST5 =
       DEFS
-          + "           MAP IN USING EMPMAP NOIO DATASTREAM FROM {$MAP1} TO {$MFLD3}\n"
+          + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MAP1} TO {$MFLD3}\n"
           + "              DETAIL FIRST RETURNKEY {$RETKEY}.\n";
 
   private static final String TST6 =
       DEFS
-          + "           MAP IN USING EMPMAP DETAIL SEQUENCE NUMBER {$SEQ-NUM}\n"
+          + "           MAP IN USING {$EMPMAP} DETAIL SEQUENCE NUMBER {$SEQ-NUM}\n"
           + "               PAGE IS {$PAG-NUM}.\n";
 
   private static final String TST7 =
       DEFS
-          + "           MAP IN USING EMPMAP\n"
+          + "           MAP IN USING {$EMPMAP}\n"
           + "             INPUT DATA NO DETAIL KEY {$DETKEY}.\n";
 
   private static final String TST8 =
-      DEFS + "           MAP IN USING EMPMAP DETAIL NEXT MODIFIED.\n";
+      DEFS + "           MAP IN USING {$EMPMAP} DETAIL NEXT MODIFIED.\n";
 
   private static final String TST9 =
-      DEFS + "           MAP IN USING EMPMAP HEADER PAGE IS {$PAG-NUM} MODIFIED.\n";
+      DEFS + "           MAP IN USING {$EMPMAP} HEADER PAGE IS {$PAG-NUM} MODIFIED.\n";
 
-  private static final String TST10 = DEFS + "           MAP IN USING EMPMAP IO INPUT DATA YES.\n";
+  private static final String TST10 =
+      DEFS + "           MAP IN USING {$EMPMAP} IO INPUT DATA YES.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9, TST10);

@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -39,44 +39,45 @@ class TestIdmsInquireMapStatement {
           + "       01 {$*CURROW} PIC S9(4).\n"
           + "       01 {$*CURCOL} PIC S9(4).\n"
           + "       01 {$*MFLD-LEN} PIC S9(4).\n"
+          + "       01 {$*EMPMAP} PIC S9(4).\n"
           + "       01 {$*MAP2}.\n"
           + "           03 FILLER OCCURS 10 TIMES INDEXED BY {$*S1}.\n"
           + "           05 {$*MAP-FLD} PIC X(5).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String TST1 =
-      DEFS + "                INQUIRE MAP EMPMAP MOVE AID TO {$MFLD}.\n";
+      DEFS + "                INQUIRE MAP {$EMPMAP} MOVE AID TO {$MFLD}.\n";
 
   private static final String TST2 =
-      DEFS + "           INQUIRE MAP EMPMAP MOVE CURSOR TO {$CURROW} {$CURCOL}.\n";
+      DEFS + "           INQUIRE MAP {$EMPMAP} MOVE CURSOR TO {$CURROW} {$CURCOL}.\n";
 
   private static final String TST3 =
-      DEFS + "           INQUIRE MAP EMPMAP MOVE IN LENGTH FOR {$MFLD} TO {$MFLD-LEN}.\n";
+      DEFS + "           INQUIRE MAP {$EMPMAP} MOVE IN LENGTH FOR {$MFLD} TO {$MFLD-LEN}.\n";
 
   private static final String TST4 =
-      DEFS + "           INQUIRE MAP EMPMAP IF INPUT CHANGED THEN DISPLAY 'CHANGED'.\n";
+      DEFS + "           INQUIRE MAP {$EMPMAP} IF INPUT CHANGED THEN DISPLAY 'CHANGED'.\n";
 
   private static final String TST5 =
       DEFS
-          + "           INQUIRE MAP EMPMAP\n"
+          + "           INQUIRE MAP {$EMPMAP}\n"
           + "           IF CURSOR AT DFLD {$MFLD2} OF {$MAP1} THEN DISPLAY 'CURSOR'.\n";
 
   private static final String TST6 =
       DEFS
-          + "           INQUIRE MAP EMPMAP\n"
+          + "           INQUIRE MAP {$EMPMAP}\n"
           + "             IF ALL BUT CURRENT DATA YES THEN DISPLAY 'YES'\n"
           + "                                              MOVE 'Y' TO {$ATT-KEY}\n"
           + "             ELSE DISPLAY 'NO'.\n";
 
   private static final String TST7 =
       DEFS
-          + "           INQUIRE MAP EMPMAP IF ALL DFLD {$MAP-FLD}({$S1}) \n"
+          + "           INQUIRE MAP {$EMPMAP} IF ALL DFLD {$MAP-FLD}({$S1}) \n"
           + "                             DFLD  {$MFLD2} OF {$MAP1} \n"
           + "                             DFLD  {$MAP-FLD}(3) \n "
           + "                             EDIT IS ERROR THEN DISPLAY 'MAP ERROR'.\n";
   private static final String TST8 =
       DEFS
-          + "           INQUIRE MAP EMPMAP IF DFLD {$MAP-FLD}({$S1}) \n"
+          + "           INQUIRE MAP {$EMPMAP} IF DFLD {$MAP-FLD}({$S1}) \n"
           + "                             DFLD  {$MFLD2} OF {$MAP1} \n "
           + "                             DFLD  {$MAP-FLD}(3) \n "
           + "                             DATA TRUNCATED THEN DISPLAY 'TRUNCATION'.\n";

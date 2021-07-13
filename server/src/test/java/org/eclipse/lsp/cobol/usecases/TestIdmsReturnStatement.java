@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,6 +33,7 @@ class TestIdmsReturnStatement {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*EMPDBK} PIC S9(8) COMP.\n"
           + "       01 {$*EMPPGI} PIC S9(8) COMP.\n"
+          + "       01 {$*IX-EMP} PIC S9(8) COMP.\n"
           + "       01 {$*INDEX-KEY}.\n"
           + "            03  {$*EMP-LAST}    PIC X(15) VALUE SPACES.\n"
           + "            03  {$*EMP-FIRST}   PIC X(10) VALUE SPACES.\n"
@@ -41,28 +42,30 @@ class TestIdmsReturnStatement {
           + "           88 {$*DB-REC-NOT-FOUND} VALUE '0326'.\n"
           + "        PROCEDURE DIVISION.\n";
 
-  private static final String TST1 = DEFS + "           RETURN {$EMPDBK} FROM IX-EMP CURRENCY.\n";
+  private static final String TST1 =
+      DEFS + "           RETURN {$EMPDBK} FROM {$IX-EMP} CURRENCY.\n";
 
   private static final String TST2 =
-      DEFS + "           RETURN {$EMPDBK} FROM IX-EMP USING {$INDEX-KEY}.\n";
+      DEFS + "           RETURN {$EMPDBK} FROM {$IX-EMP} USING {$INDEX-KEY}.\n";
 
   private static final String TST3 =
-      DEFS + "           RETURN {$EMPDBK} FROM IX-EMP PRIOR KEY INTO {$INDEX-KEY}.\n";
+      DEFS + "           RETURN {$EMPDBK} FROM {$IX-EMP} PRIOR KEY INTO {$INDEX-KEY}.\n";
 
   private static final String TST4 =
-      DEFS + "           RETURN {$EMPDBK} FROM IX-EMP NEXT CURRENCY KEY {$INDEX-KEY}.\n";
+      DEFS + "           RETURN {$EMPDBK} FROM {$IX-EMP} NEXT CURRENCY KEY {$INDEX-KEY}.\n";
 
   private static final String TST5 =
-      DEFS + "           RETURN {$EMPDBK} FROM IX-EMP USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}.\n";
+      DEFS
+          + "           RETURN {$EMPDBK} FROM {$IX-EMP} USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}.\n";
 
   private static final String TST6 =
       DEFS
-          + "           RETURN {$EMPDBK} FROM IX-EMP USING {$INDEX-KEY}\n"
+          + "           RETURN {$EMPDBK} FROM {$IX-EMP} USING {$INDEX-KEY}\n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
 
   private static final String TST7 =
       DEFS
-          + "           RETURN {$EMPDBK} FROM IX-EMP USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}\n"
+          + "           RETURN {$EMPDBK} FROM {$IX-EMP} USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}\n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
 
   private static Stream<String> textsToTest() {

@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,11 +33,14 @@ class TestIdmsKeepStatement {
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_ID} PIC X(8).\n"
           + "        01 {$*WK_LOC} PIC S9(8) COMP.\n"
+          + "        01 {$*EMPLOYEE} PIC S9(8) COMP.\n"
+          + "        01 {$*DEPT-EMP} PIC S9(8) COMP.\n"
           + "        PROCEDURE DIVISION.\n";
 
-  private static final String KEEP1 = DEFS + "           KEEP CURRENT EMPLOYEE.\n";
+  private static final String KEEP1 = DEFS + "           KEEP CURRENT {$EMPLOYEE}.\n";
 
-  private static final String KEEP2 = DEFS + "           KEEP EXCLUSIVE CURRENT WITHIN DEPT-EMP\n";
+  private static final String KEEP2 =
+      DEFS + "           KEEP EXCLUSIVE CURRENT WITHIN {$DEPT-EMP}\n";
 
   private static final String KEEP3 = DEFS + "           KEEP CURRENT.\n";
 

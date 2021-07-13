@@ -2947,7 +2947,7 @@ classCondition
    ;
 
 conditionNameReference
-   : conditionName inData* conditionNameSubscriptReference*
+   : dataName inData* conditionNameSubscriptReference*
    ;
 
 conditionNameSubscriptReference

@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Test IDMS Modify DML statements */
@@ -25,8 +25,11 @@ class TestIdmsModifyStatement {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*EMPLOYEE} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MODIFY EMPLOYEE.\n";
+          + "       MODIFY {$EMPLOYEE}.\n";
 
   @Test
   void test() {

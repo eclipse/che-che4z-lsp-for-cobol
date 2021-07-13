@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,12 +32,14 @@ class TestIdmsIfStatement {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*MT-FLAG} PIC X.\n"
+          + "       01 {$*IX-EMP} PIC X.\n"
           + "        PROCEDURE DIVISION.\n";
 
   private static final String TST1 =
-      DEFS + "           IF NOT IX-EMP MEMBER DISPLAY 'X' ELSE DISPLAY 'Y' END-IF  .\n";
+      DEFS + "           IF NOT {$IX-EMP} MEMBER DISPLAY 'X' ELSE DISPLAY 'Y' END-IF  .\n";
 
-  private static final String TST2 = DEFS + "           IF IX-EMP EMPTY MOVE 'X' TO {$MT-FLAG}.\n";
+  private static final String TST2 =
+      DEFS + "           IF {$IX-EMP} EMPTY MOVE 'X' TO {$MT-FLAG}.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(TST1, TST2);

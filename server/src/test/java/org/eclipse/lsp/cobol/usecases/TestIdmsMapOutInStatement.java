@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,23 +32,25 @@ class TestIdmsMapOutInStatement {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*MFLD} PIC X(8).\n"
+          + "       01 {$*EMPMAP} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n";
 
-  private static final String TST1 = DEFS + "                MAP OUTIN USING EMPMAP.\n";
+  private static final String TST1 = DEFS + "                MAP OUTIN USING {$EMPMAP}.\n";
 
-  private static final String TST2 = DEFS + "           MAP OUTIN USING EMPMAP INPUT DATA YES.\n";
+  private static final String TST2 =
+      DEFS + "           MAP OUTIN USING {$EMPMAP} INPUT DATA YES.\n";
 
   private static final String TST3 =
-      DEFS + "           MAP OUTIN USING EMPMAP  OUTPUT DATA NO ERASE.\n";
+      DEFS + "           MAP OUTIN USING {$EMPMAP}  OUTPUT DATA NO ERASE.\n";
 
   private static final String TST4 =
       DEFS
-          + "           MAP OUTIN USING EMPMAP OUTPUT NEWPAGE LITERALS\n"
+          + "           MAP OUTIN USING {$EMPMAP} OUTPUT NEWPAGE LITERALS\n"
           + "              INPUT DATA IS NO.\n";
 
   private static final String TST5 =
       DEFS
-          + "           MAP OUTIN USING EMPMAP OUTPUT LITERALS\n"
+          + "           MAP OUTIN USING {$EMPMAP} OUTPUT LITERALS\n"
           + "              INPUT DATA YES MESSAGE IS {$MFLD} LENGTH 10.\n";
 
   private static Stream<String> textsToTest() {

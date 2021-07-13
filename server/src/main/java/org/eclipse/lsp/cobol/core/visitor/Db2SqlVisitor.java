@@ -79,7 +79,7 @@ public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
                     variableCtx,
                     loc ->
                         new VariableUsageNode(
-                            dataName, locality, VariableUsageNode.Type.SQL_VALUE));
+                            dataName, locality, ImmutableList.of()));
             })
         .orElseGet(() -> visitChildren(parentCtx));
   }

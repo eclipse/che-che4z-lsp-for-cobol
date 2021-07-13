@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -36,51 +35,25 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class VariableUsageNode extends Node {
   private final String dataName;
-  private final Type variableUsageType;
-  private final CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
-  private final CobolParser.ConditionNameReferenceContext nameReferenceContext;
+  private final List<VariableNameAndLocality> parents;
+  private final ReferenceType type;
 
-  private List<String> parents;
+  public VariableUsageNode(
+          String dataName,
+          Locality locality,
+          List<VariableNameAndLocality> parents) {
+    this(dataName, locality, parents, ReferenceType.STRUCTURE);
+  }
 
   public VariableUsageNode(
       String dataName,
       Locality locality,
-      CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context) {
+      List<VariableNameAndLocality> parents,
+      ReferenceType type) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
-    this.dataNameFormat1Context = dataNameFormat1Context;
-    variableUsageType = Type.DATA_NAME;
-    nameReferenceContext = null;
-  }
-
-  public VariableUsageNode(String dataName, Locality locality, Type variableUsageType) {
-    super(locality, NodeType.VARIABLE_USAGE);
-    this.dataName = dataName;
-    this.variableUsageType = variableUsageType;
-    this.parents = ImmutableList.of();
-    dataNameFormat1Context = null;
-    nameReferenceContext = null;
-  }
-
-  public VariableUsageNode(
-      String dataName, Locality locality, Type variableUsageType, List<String> parents) {
-    super(locality, NodeType.VARIABLE_USAGE);
-    this.dataName = dataName;
-    this.variableUsageType = variableUsageType;
     this.parents = parents;
-    dataNameFormat1Context = null;
-    nameReferenceContext = null;
-  }
-
-  public VariableUsageNode(
-      String dataName,
-      Locality locality,
-      CobolParser.ConditionNameReferenceContext nameReferenceContext) {
-    super(locality, NodeType.VARIABLE_USAGE);
-    this.dataName = dataName;
-    this.nameReferenceContext = nameReferenceContext;
-    variableUsageType = Type.CONDITION_CALL;
-    dataNameFormat1Context = null;
+    this.type = type;
   }
 
   @Override
@@ -89,35 +62,19 @@ public class VariableUsageNode extends Node {
         .map(ProgramNode.class::cast)
         .map(ProgramNode::getVariableUsageDelegate)
         .ifPresent(
-            variableUsageDelegate -> {
-              switch (variableUsageType) {
-                case DATA_NAME:
-                  variableUsageDelegate.handleDataName(
-                      dataName, getLocality(), dataNameFormat1Context);
-                  break;
-                case SQL_VALUE:
-                case TABLE_CALL:
-                case GENERAL:
-                  variableUsageDelegate.handleGeneralCall(dataName, getLocality(), parents);
-                  break;
-                case CONDITION_CALL:
-                  variableUsageDelegate.handleConditionCall(
-                      dataName, getLocality(), nameReferenceContext);
-                  break;
-                default:
-                  // No other variable usage types exist, this is unreachable, but just in case.
-                  break;
-              }
-            });
+            variableUsageDelegate ->
+                variableUsageDelegate.handleUsage(dataName, getLocality(), parents, type));
+
     return ImmutableList.of();
   }
 
-  /** Represents different types of variable usages. */
-  public enum Type {
-    DATA_NAME,
-    SQL_VALUE,
-    TABLE_CALL,
-    CONDITION_CALL,
-    GENERAL,
+  /**
+   * This enum determines the type of referencing the variable in the original document. E.g.
+   * STRUCTURE if the variable is referenced by its hierarchy (default case) or CONTEXT if the
+   * variable structure is clear from the context and don't have to be specified explicitly
+   */
+  public enum ReferenceType {
+    STRUCTURE,
+    CONTEXT
   }
 }

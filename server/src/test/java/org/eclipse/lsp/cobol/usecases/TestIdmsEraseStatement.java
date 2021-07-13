@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,15 +29,18 @@ class TestIdmsEraseStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*EMPLOYEE} PIC X(8).\n"
           + "        PROCEDURE DIVISION.\n";
 
-  private static final String ERAS1 = DEFS + "           ERASE EMPLOYEE SELECTIVE MEMBERS\n";
+  private static final String ERAS1 = DEFS + "           ERASE {$EMPLOYEE} SELECTIVE MEMBERS\n";
 
-  private static final String ERAS2 = DEFS + "           ERASE EMPLOYEE ALL MEMBERS\n";
+  private static final String ERAS2 = DEFS + "           ERASE {$EMPLOYEE} ALL MEMBERS\n";
 
-  private static final String ERAS3 = DEFS + "           ERASE EMPLOYEE PERMANENT MEMBERS\n";
+  private static final String ERAS3 = DEFS + "           ERASE {$EMPLOYEE} PERMANENT MEMBERS\n";
 
-  private static final String ERAS4 = DEFS + "           ERASE EMPLOYEE.\n";
+  private static final String ERAS4 = DEFS + "           ERASE {$EMPLOYEE}.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(ERAS1, ERAS2, ERAS3, ERAS4);

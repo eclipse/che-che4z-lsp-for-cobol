@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,17 +33,20 @@ class TestIdmsConDisconnectStatement {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
           + "           88 {$*DB-REC-NOT-FOUND} VALUE '0326'.\n"
+          + "       01 {$*EMPLOYEE} PIC X(8).\n"
+          + "       01 {$*OFFICE-EMPLOYEE} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String DISC1 =
-      DEFS + "           DISCONNECT EMPLOYEE FROM OFFICE-EMPLOYEE\n";
+      DEFS + "           DISCONNECT {$EMPLOYEE} FROM {$OFFICE-EMPLOYEE}\n";
 
   private static final String DISC2 =
       DEFS
-          + "           DISCONNECT EMPLOYEE FROM OFFICE-EMPLOYEE \n"
+          + "           DISCONNECT {$EMPLOYEE} FROM {$OFFICE-EMPLOYEE} \n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.  \n";
 
-  private static final String CONN1 = DEFS + "           CONNECT EMPLOYEE TO OFFICE-EMPLOYEE\n";
+  private static final String CONN1 =
+      DEFS + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(DISC1, DISC2, CONN1);
